@@ -1,0 +1,6 @@
+{
+  "name": "ExpiryGuard - Supermarket Expiry Management",
+  "description": "Multi-tenant SaaS application for supermarkets and malls to track product expiration dates, automate safety alerts, and manage stock clearances.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

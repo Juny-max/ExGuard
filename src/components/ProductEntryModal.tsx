@@ -95,7 +95,15 @@ export const ProductEntryModal: React.FC<ProductEntryModalProps> = ({
     e.preventDefault();
     if (!productName.trim() || !expiryDate) return;
 
-    const category = categories.find((c) => c.id === categoryId) || categories[0];
+    const category = categories.find((c) => c?.id === categoryId) || categories[0] || {
+      id: 'cat-general',
+      tenantId: currentTenant?.id || 'tenant-default',
+      name: 'General Groceries',
+      code: 'CAT-GEN',
+      description: 'General grocery category',
+      defaultShelfLifeDays: 30,
+      colorBadge: 'emerald',
+    };
 
     let createdProduct: Product | undefined = undefined;
     const finalProductId = selectedProductId === 'NEW' ? `prod-${Date.now()}` : selectedProductId;
@@ -103,7 +111,7 @@ export const ProductEntryModal: React.FC<ProductEntryModalProps> = ({
     if (selectedProductId === 'NEW') {
       createdProduct = {
         id: finalProductId,
-        tenantId: currentTenant.id,
+        tenantId: currentTenant?.id || category.tenantId || 'tenant-default',
         categoryId: category.id,
         name: productName,
         brand: brand || 'House Brand',
@@ -118,10 +126,10 @@ export const ProductEntryModal: React.FC<ProductEntryModalProps> = ({
 
     const newBatch: Batch = {
       id: `bat-${Date.now()}`,
-      tenantId: currentTenant.id,
+      tenantId: currentTenant?.id || category.tenantId || 'tenant-default',
       productId: finalProductId,
       productName: productName,
-      categoryName: category.name,
+      categoryName: category.name || 'General Groceries',
       brand: brand || 'House Brand',
       sku: sku || `SKU-${Date.now()}`,
       barcode: barcode || `890123${Date.now().toString().slice(-6)}`,
@@ -383,7 +391,7 @@ export const ProductEntryModal: React.FC<ProductEntryModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Unit Cost ($)
+                  Unit Cost (GH₵)
                 </label>
                 <input
                   type="number"
@@ -396,7 +404,7 @@ export const ProductEntryModal: React.FC<ProductEntryModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Retail Price ($)
+                  Retail Price (GH₵)
                 </label>
                 <input
                   type="number"

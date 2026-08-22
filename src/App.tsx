@@ -25,6 +25,7 @@ import {
   INITIAL_DISPOSAL_LOGS,
   determineStatus,
 } from './data/mockData.ts';
+import { formatCedi } from './utils/currency.ts';
 
 import { Header } from './components/Header.tsx';
 import { Sidebar } from './components/Sidebar.tsx';
@@ -45,6 +46,7 @@ import { LoginPage } from './components/LoginPage.tsx';
 import { ForgotPasswordPage } from './components/ForgotPasswordPage.tsx';
 import { SignUpPage } from './components/SignUpPage.tsx';
 import { LandingHomePage } from './components/LandingHomePage.tsx';
+import { LiquidGlassToast } from './components/LiquidGlassToast.tsx';
 
 export default function App() {
   // Global & Authentication State
@@ -157,7 +159,7 @@ export default function App() {
         return b;
       })
     );
-    showToast(`Applied ${discountPct}% clearance discount on ${batch.productName} (New Price: $${discountedPrice.toFixed(2)})`);
+    showToast(`Applied ${discountPct}% clearance discount on ${batch.productName} (New Price: ${formatCedi(discountedPrice)})`);
   };
 
   const handleOpenDisposalModal = (batch: Batch) => {
@@ -216,50 +218,46 @@ export default function App() {
 
   // If not logged in, render LandingHomePage, LoginPage, ForgotPasswordPage, or SignUpPage
   if (!isLoggedIn || !currentUser) {
-    if (authView === 'HOME') {
-      return (
-        <LandingHomePage
-          onNavigateLogin={() => setAuthView('LOGIN')}
-          onNavigateSignUp={() => setAuthView('SIGNUP')}
-          onOpenDemoStore={() => {
-            // Auto-sign in with demo Store Owner to immediately preview the system
-            const demoUser = users.find((u) => u.role === 'STORE_MANAGER') || users[0];
-            handleLogin(demoUser, currentTenant);
-          }}
-        />
-      );
-    }
-
-    if (authView === 'FORGOT_PASSWORD') {
-      return (
-        <ForgotPasswordPage
-          onBackToLogin={() => setAuthView('LOGIN')}
-          defaultEmail="s.jenkins@greenmart.example.com"
-        />
-      );
-    }
-
-    if (authView === 'SIGNUP') {
-      return (
-        <SignUpPage
-          currentTenant={currentTenant}
-          onSignUp={handleSignUp}
-          onNavigateLogin={() => setAuthView('LOGIN')}
-          onNavigateHome={() => setAuthView('HOME')}
-        />
-      );
-    }
-
     return (
-      <LoginPage
-        tenants={tenants}
-        users={users}
-        currentTenant={currentTenant}
-        onLogin={handleLogin}
-        onNavigateForgotPassword={() => setAuthView('FORGOT_PASSWORD')}
-        onNavigateSignUp={() => setAuthView('SIGNUP')}
-        onNavigateHome={() => setAuthView('HOME')}
-      />
+      <>
+        <LiquidGlassToast message={toastMessage} onClose={() => setToastMessage(null)} />
+        {authView === 'HOME' && (
+          <LandingHomePage
+            onNavigateLogin={() => setAuthView('LOGIN')}
+            onNavigateSignUp={() => setAuthView('SIGNUP')}
+            onOpenDemoStore={() => {
+              // Auto-sign in with demo Store Owner to immediately preview the system
+              const demoUser = users.find((u) => u.role === 'STORE_MANAGER') || users[0];
+              handleLogin(demoUser, currentTenant);
+            }}
+          />
+        )}
+        {authView === 'FORGOT_PASSWORD' && (
+          <ForgotPasswordPage
+            onBackToLogin={() => setAuthView('LOGIN')}
+            defaultEmail="s.jenkins@greenmart.example.com"
+          />
+        )}
+        {authView === 'SIGNUP' && (
+          <SignUpPage
+            currentTenant={currentTenant}
+            onSignUp={handleSignUp}
+            onNavigateLogin={() => setAuthView('LOGIN')}
+            onNavigateHome={() => setAuthView('HOME')}
+          />
+        )}
+        {authView === 'LOGIN' && (
+          <LoginPage
+            tenants={tenants}
+            users={users}
+            currentTenant={currentTenant}
+            onLogin={handleLogin}
+            onNavigateForgotPassword={() => setAuthView('FORGOT_PASSWORD')}
+            onNavigateSignUp={() => setAuthView('SIGNUP')}
+            onNavigateHome={() => setAuthView('HOME')}
+          />
+        )}
+      </>
     );
   }
 
@@ -270,13 +268,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 flex font-sans antialiased selection:bg-emerald-200 selection:text-emerald-950">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 bg-emerald-950 text-emerald-50 px-4 py-3 rounded-xl shadow-xl border border-emerald-800 text-xs font-semibold flex items-center gap-2 max-w-md animate-fade-in">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      {/* Apple-Style Liquid Glass Toast Notification */}
+      <LiquidGlassToast message={toastMessage} onClose={() => setToastMessage(null)} />
 
       {/* Left Sidebar (Full height, touching screen's left edge) */}
       <Sidebar
@@ -361,8 +354,12 @@ export default function App() {
               <FastScannerView
                 currentTenant={currentTenant}
                 currentRole={currentRole}
+                currentUser={currentUser}
                 batches={batches}
                 onOpenDisposalModal={handleOpenDisposalModal}
+                onRecordSale={(items) => {
+                  showToast(`Invoice generated for ${items.length} items.`);
+                }}
               />
             )}
 
@@ -416,8 +413,16 @@ export default function App() {
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
         currentTenant={currentTenant}
-        categories={categories.filter((c) => c.tenantId === currentTenant.id)}
-        existingProducts={products.filter((p) => p.tenantId === currentTenant.id)}
+        categories={
+          categories.filter((c) => c.tenantId === currentTenant?.id).length > 0
+            ? categories.filter((c) => c.tenantId === currentTenant?.id)
+            : categories
+        }
+        existingProducts={
+          products.filter((p) => p.tenantId === currentTenant?.id).length > 0
+            ? products.filter((p) => p.tenantId === currentTenant?.id)
+            : products
+        }
         onSaveBatch={handleSaveNewBatch}
       />
 

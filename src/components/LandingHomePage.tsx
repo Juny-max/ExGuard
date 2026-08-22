@@ -1,6 +1,6 @@
 import React from 'react';
+import { ExpiryGuardLogo } from './ExpiryGuardLogo.tsx';
 import {
-  ShieldCheckIcon,
   QrCodeIcon,
   SparklesIcon,
   BellAlertIcon,
@@ -31,8 +31,8 @@ export const LandingHomePage: React.FC<LandingHomePageProps> = ({
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
           {/* Logo & Brand */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-600 flex items-center justify-center shadow-md shrink-0">
-              <ShieldCheckIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-md shrink-0 border border-emerald-800">
+              <ExpiryGuardLogo className="w-full h-full" variant="original" />
             </div>
             <div>
               <span className="text-base sm:text-xl font-black tracking-tight flex items-center gap-1.5 leading-none">

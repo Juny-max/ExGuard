@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Tenant, UserRole, Batch, DisposalLog, DisposalReason } from '../types/index.ts';
+import { formatCedi } from '../utils/currency.ts';
 import {
   XMarkIcon,
   TrashIcon,
@@ -133,7 +134,7 @@ export const DisposalModal: React.FC<DisposalModalProps> = ({
           <div className="bg-gray-50 p-3 rounded-xl border border-gray-200 flex items-center justify-between text-xs">
             <span className="text-gray-600 font-medium">Estimated Financial Cost Loss:</span>
             <span className="text-sm font-bold text-red-700">
-              ${totalLoss.toFixed(2)} ({quantity} x ${batch.unitCost.toFixed(2)} cost)
+              {formatCedi(totalLoss)} ({quantity} x {formatCedi(batch.unitCost)} cost)
             </span>
           </div>
 

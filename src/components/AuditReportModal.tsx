@@ -1,10 +1,12 @@
 import React from 'react';
 import { Tenant, Batch } from '../types/index.ts';
+import { formatCedi } from '../utils/currency.ts';
+import { printElementById } from '../utils/printReceipt.ts';
+import { ExpiryGuardLogo } from './ExpiryGuardLogo.tsx';
 import {
   XMarkIcon,
   DocumentArrowDownIcon,
   PrinterIcon,
-  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 
 interface AuditReportModalProps {
@@ -76,7 +78,10 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
   };
 
   const handlePrint = () => {
-    window.print();
+    const success = printElementById('printable-audit-report', `Audit-Report-${currentTenant.code}`);
+    if (!success) {
+      window.print();
+    }
   };
 
   return (
@@ -85,7 +90,9 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
         {/* Header */}
         <div className="bg-emerald-900 text-white px-5 sm:px-6 py-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
-            <ShieldCheckIcon className="w-6 h-6 text-emerald-300" />
+            <div className="w-8 h-8 rounded-lg bg-white p-1 flex items-center justify-center border border-emerald-700/60 shadow-xs">
+              <ExpiryGuardLogo className="w-full h-full" />
+            </div>
             <div>
               <h2 className="text-sm sm:text-base font-bold">Official Stock Freshness & Expiry Audit Report</h2>
               <p className="text-xs text-emerald-200">
@@ -102,7 +109,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
         </div>
 
         {/* Report Content */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
+        <div id="printable-audit-report" className="p-4 sm:p-6 overflow-y-auto space-y-5 flex-1">
           {/* Executive KPI Overview */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200 text-xs">
             <div>
@@ -119,7 +126,7 @@ export const AuditReportModal: React.FC<AuditReportModalProps> = ({
             </div>
             <div>
               <span className="text-gray-500 font-semibold block uppercase">Expired Cost Loss</span>
-              <span className="text-lg font-bold text-red-700">${totalLoss.toFixed(2)}</span>
+              <span className="text-lg font-bold text-red-700">{formatCedi(totalLoss)}</span>
             </div>
           </div>
 

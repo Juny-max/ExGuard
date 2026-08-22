@@ -27,7 +27,7 @@ export const CategoriesView: React.FC<CategoriesViewProps> = ({
   const [shelfLifeDays, setShelfLifeDays] = useState(14);
   const [description, setDescription] = useState('');
 
-  const tenantCategories = categories.filter((c) => c.tenantId === currentTenant.id);
+  const tenantCategories = (categories || []).filter((c) => c && c.tenantId === currentTenant?.id);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,12 +1,12 @@
 import React from 'react';
 import { Tenant, UserRole, Batch, User } from '../types/index.ts';
+import { ExpiryGuardLogo } from './ExpiryGuardLogo.tsx';
 import {
   BuildingStorefrontIcon,
   UserCircleIcon,
   BellAlertIcon,
   PlusIcon,
   QrCodeIcon,
-  ShieldCheckIcon,
   Bars3Icon,
   XMarkIcon,
   CameraIcon,
@@ -41,16 +41,16 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleMobileMenu,
   isMobileMenuOpen = false,
 }) => {
-  const expiredCount = batches.filter(
-    (b) => b.tenantId === currentTenant.id && b.status === 'EXPIRED' && b.currentQuantity > 0
+  const expiredCount = (batches || []).filter(
+    (b) => b && b.tenantId === currentTenant?.id && b.status === 'EXPIRED' && b.currentQuantity > 0
   ).length;
 
-  const criticalCount = batches.filter(
-    (b) => b.tenantId === currentTenant.id && b.status === 'CRITICAL_7' && b.currentQuantity > 0
+  const criticalCount = (batches || []).filter(
+    (b) => b && b.tenantId === currentTenant?.id && b.status === 'CRITICAL_7' && b.currentQuantity > 0
   ).length;
 
   const totalUrgent = expiredCount + criticalCount;
-  const isSingleStore = allTenants.length <= 1;
+  const isSingleStore = (allTenants || []).length <= 1;
 
   return (
     <header className="bg-white border-b border-emerald-100 sticky top-0 z-30 shadow-xs">
@@ -70,6 +70,13 @@ export const Header: React.FC<HeaderProps> = ({
                 <Bars3Icon className="w-5 h-5 text-gray-800" />
               )}
             </button>
+
+            {/* Mobile Brand Logo */}
+            <div className="md:hidden flex items-center gap-1.5 shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-white p-0.5 border border-emerald-200 shadow-xs flex items-center justify-center">
+                <ExpiryGuardLogo className="w-full h-full" />
+              </div>
+            </div>
 
             {/* Store Name Badge (Responsive) */}
             <div className="flex items-center bg-stone-50 border border-stone-200 rounded-xl px-2.5 sm:px-3 py-1.5 max-w-[140px] sm:max-w-[220px] md:max-w-none">

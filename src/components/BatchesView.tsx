@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Tenant, UserRole, Batch, Category, BatchStatus } from '../types/index.ts';
 import { StatusBadge } from './StatusBadge.tsx';
+import { formatCedi } from '../utils/currency.ts';
 import {
   MagnifyingGlassIcon,
   FunnelIcon,
@@ -38,8 +39,8 @@ export const BatchesView: React.FC<BatchesViewProps> = ({
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState<'expiry_asc' | 'expiry_desc' | 'qty_desc' | 'name_asc'>('expiry_asc');
 
-  const tenantBatches = batches.filter(
-    (b) => b.tenantId === currentTenant.id && b.status !== 'DISPOSED'
+  const tenantBatches = (batches || []).filter(
+    (b) => b && b.tenantId === currentTenant?.id && b.status !== 'DISPOSED'
   );
 
   const filteredBatches = useMemo(() => {
@@ -268,7 +269,7 @@ export const BatchesView: React.FC<BatchesViewProps> = ({
                       <span className="text-[10px] text-gray-500 block uppercase font-bold">Quantity & Price</span>
                       <div className="font-bold text-gray-900">{batch.currentQuantity} {batch.unit}</div>
                       <div className="text-emerald-800 font-semibold text-[11px]">
-                        ${batch.discountPercentage > 0 ? (batch.discountedPrice?.toFixed(2)) : batch.unitPrice.toFixed(2)}
+                        {batch.discountPercentage > 0 ? formatCedi(batch.discountedPrice || 0) : formatCedi(batch.unitPrice)}
                       </div>
                     </div>
                   </div>
@@ -391,10 +392,10 @@ export const BatchesView: React.FC<BatchesViewProps> = ({
                         {batch.discountPercentage > 0 ? (
                           <div>
                             <span className="line-through text-gray-400 text-[11px]">
-                              ${batch.unitPrice.toFixed(2)}
+                              {formatCedi(batch.unitPrice)}
                             </span>
                             <div className="font-bold text-emerald-800">
-                              ${batch.discountedPrice?.toFixed(2)}
+                              {formatCedi(batch.discountedPrice || 0)}
                               <span className="ml-1 text-[10px] bg-emerald-100 text-emerald-800 px-1 rounded-sm">
                                 -{batch.discountPercentage}%
                               </span>
@@ -402,7 +403,7 @@ export const BatchesView: React.FC<BatchesViewProps> = ({
                           </div>
                         ) : (
                           <span className="font-semibold text-gray-900">
-                            ${batch.unitPrice.toFixed(2)}
+                            {formatCedi(batch.unitPrice)}
                           </span>
                         )}
                       </td>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tenant, UserRole, Batch, BatchStatus, User } from '../types/index.ts';
 import { StatusBadge } from './StatusBadge.tsx';
+import { formatCedi } from '../utils/currency.ts';
 import {
   ShieldCheckIcon,
   ExclamationTriangleIcon,
@@ -53,7 +54,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenAddBranchModal,
   onSelectTenant,
 }) => {
-  const tenantBatches = batches.filter((b) => b.tenantId === currentTenant.id && b.status !== 'DISPOSED');
+  const tenantBatches = (batches || []).filter((b) => b && b.tenantId === currentTenant?.id && b.status !== 'DISPOSED');
 
   // Metric breakdown
   const healthyBatches = tenantBatches.filter((b) => b.status === 'SAFE');
@@ -71,8 +72,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const criticalAtRiskValue = critical7Batches.reduce((acc, b) => acc + b.currentQuantity * b.unitCost, 0);
 
   // Cashiers for this store
-  const tenantCashiers = users.filter(
-    (u) => u.tenantId === currentTenant.id && u.role === 'CASHIER'
+  const tenantCashiers = (users || []).filter(
+    (u) => u && u.tenantId === currentTenant?.id && u.role === 'CASHIER'
   );
 
   // Immediate attention list: Expired first, then Critical 7d, then 14d
@@ -129,23 +130,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* Critical Banner If Expired Items Exist */}
       {expiredBatches.length > 0 && (
-        <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded-r-xl shadow-xs">
+        <div className="bg-red-50/70 border border-red-200 p-4 rounded-xl shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-start gap-3">
-              <XCircleIcon className="w-6 h-6 text-red-600 shrink-0 mt-0.5" />
+              <div className="w-8 h-8 rounded-lg bg-red-100/80 border border-red-200 flex items-center justify-center shrink-0 mt-0.5">
+                <XCircleIcon className="w-5 h-5 text-red-700" />
+              </div>
               <div>
                 <h3 className="text-sm font-bold text-red-950">
                   Critical Compliance Action Required: {expiredBatches.length} Expired Batches on Record
                 </h3>
                 <p className="text-xs text-red-800 mt-1">
                   Expired goods pose consumer safety hazards and must be pulled from supermarket display aisles immediately.
-                  Estimated discard cost: ${expiredLossValue.toFixed(2)}.
+                  Estimated discard cost: <strong className="text-red-950 font-semibold">{formatCedi(expiredLossValue)}</strong>.
                 </p>
               </div>
             </div>
             <button
               onClick={() => onNavigateTab('ALERTS')}
-              className="px-3.5 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-semibold rounded-lg transition-colors shrink-0 cursor-pointer shadow-2xs self-start sm:self-auto"
+              className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-semibold rounded-lg transition-colors shrink-0 cursor-pointer shadow-2xs self-start sm:self-auto"
             >
               Review Expired Stock
             </button>
@@ -218,7 +221,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               {critical7Batches.length}
             </span>
             <span className="text-xs font-medium text-gray-500">
-              batches (${criticalAtRiskValue.toFixed(2)} at risk)
+              batches ({formatCedi(criticalAtRiskValue)} at risk)
             </span>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-rose-700">
@@ -242,7 +245,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               {expiredBatches.length}
             </span>
             <span className="text-xs font-medium text-gray-500">
-              batches (${expiredLossValue.toFixed(2)} total loss)
+              batches ({formatCedi(expiredLossValue)} total loss)
             </span>
           </div>
           <div className="mt-3 flex items-center gap-1.5 text-xs text-red-700">

@@ -29,7 +29,7 @@ export const AlertsView: React.FC<AlertsViewProps> = ({
 }) => {
   const [activeTier, setActiveTier] = useState<'ALL' | 'EXPIRED' | 'CRITICAL_7' | 'WARNING_14' | 'WARNING_30'>('ALL');
 
-  const tenantBatches = batches.filter((b) => b.tenantId === currentTenant.id && b.status !== 'DISPOSED');
+  const tenantBatches = (batches || []).filter((b) => b && b.tenantId === currentTenant?.id && b.status !== 'DISPOSED');
 
   const alertBatches = tenantBatches.filter((b) => b.status !== 'SAFE');
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Tenant, UserRole, Batch } from '../types/index.ts';
 import { StatusBadge } from './StatusBadge.tsx';
+import { formatCedi } from '../utils/currency.ts';
 import {
   TagIcon,
   SparklesIcon,
@@ -25,8 +26,8 @@ export const ClearanceView: React.FC<ClearanceViewProps> = ({
   const [discountInput, setDiscountInput] = useState<{ [batchId: string]: number }>({});
   const [printSuccessMessage, setPrintSuccessMessage] = useState<string | null>(null);
 
-  const tenantBatches = batches.filter(
-    (b) => b.tenantId === currentTenant.id && b.status !== 'DISPOSED' && b.status !== 'EXPIRED'
+  const tenantBatches = (batches || []).filter(
+    (b) => b && b.tenantId === currentTenant?.id && b.status !== 'DISPOSED' && b.status !== 'EXPIRED'
   );
 
   // Candidates for clearance: items with <= 14 days or already discounted
@@ -114,11 +115,11 @@ export const ClearanceView: React.FC<ClearanceViewProps> = ({
                   </span>
                   <div className="flex items-center justify-center gap-2 mt-1">
                     <span className={`text-sm ${hasDiscount ? 'line-through text-gray-400' : 'font-bold text-gray-900'}`}>
-                      ${batch.unitPrice.toFixed(2)}
+                      {formatCedi(batch.unitPrice)}
                     </span>
                     {hasDiscount && (
                       <span className="text-lg font-extrabold text-emerald-800">
-                        ${batch.discountedPrice?.toFixed(2)}
+                        {formatCedi(batch.discountedPrice || 0)}
                       </span>
                     )}
                   </div>

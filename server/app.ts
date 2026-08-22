@@ -2,6 +2,7 @@ import express from 'express';
 import { productsRouter } from './routes/products.js';
 import { batchesRouter } from './routes/batches.js';
 import { alertsRouter, disposalRouter, tenantsRouter } from './routes/alerts.js';
+import { salesRouter } from './routes/sales.js';
 import { getDatabaseStatus } from './db/supabaseClient.js';
 
 export function createExpressApp() {
@@ -24,6 +25,7 @@ export function createExpressApp() {
   app.use('/api/batches', batchesRouter);
   app.use('/api/alerts', alertsRouter);
   app.use('/api/disposal', disposalRouter);
+  app.use('/api/sales', salesRouter);
 
   return app;
 }

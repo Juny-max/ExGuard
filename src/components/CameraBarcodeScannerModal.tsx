@@ -30,12 +30,13 @@ import {
 interface CameraBarcodeScannerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentTenant: Tenant;
-  batches: Batch[];
+  currentTenant?: Tenant | null;
+  batches?: Batch[];
   onSelectBatch?: (batch: Batch) => void;
   onOpenDisposalModal?: (batch: Batch) => void;
   onBarcodeDetected?: (barcode: string) => void;
   onAddNewProductWithBarcode?: (barcode: string) => void;
+  onScanSuccess?: (barcode: string) => void;
   title?: string;
   subtitle?: string;
 }
@@ -171,11 +172,12 @@ export const CameraBarcodeScannerModal: React.FC<CameraBarcodeScannerModalProps>
   isOpen,
   onClose,
   currentTenant,
-  batches,
+  batches = [],
   onSelectBatch,
   onOpenDisposalModal,
   onBarcodeDetected,
   onAddNewProductWithBarcode,
+  onScanSuccess,
   title = 'Barcode Expiry Scanner',
   subtitle = 'Instant supermarket shelf & POS verification',
 }) => {
@@ -214,6 +216,7 @@ export const CameraBarcodeScannerModal: React.FC<CameraBarcodeScannerModalProps>
   const currentTenantRef = useRef(currentTenant);
   const soundEnabledRef = useRef(soundEnabled);
   const onBarcodeDetectedRef = useRef(onBarcodeDetected);
+  const onScanSuccessRef = useRef(onScanSuccess);
 
   useEffect(() => {
     batchesRef.current = batches;
@@ -231,14 +234,19 @@ export const CameraBarcodeScannerModal: React.FC<CameraBarcodeScannerModalProps>
     onBarcodeDetectedRef.current = onBarcodeDetected;
   }, [onBarcodeDetected]);
 
+  useEffect(() => {
+    onScanSuccessRef.current = onScanSuccess;
+  }, [onScanSuccess]);
+
   // Pre-configured MultiFormatReader
   const readerRef = useRef<MultiFormatReader | null>(null);
 
   const activeTenantBatches = useMemo(() => {
-    return batches.filter(
-      (b) => b.tenantId === currentTenant.id && b.status !== 'DISPOSED'
+    const tenantId = currentTenant?.id;
+    return (batches || []).filter(
+      (b) => b && (!tenantId || b.tenantId === tenantId) && b.status !== 'DISPOSED'
     );
-  }, [batches, currentTenant.id]);
+  }, [batches, currentTenant?.id]);
 
   const handleProcessBarcode = useCallback((rawCode: string) => {
     const cleanCode = rawCode.trim().replace(/[\r\n\t]/g, '');
@@ -259,15 +267,16 @@ export const CameraBarcodeScannerModal: React.FC<CameraBarcodeScannerModalProps>
       setIsTargetLocked(false);
     }, 1400);
 
-    const tenantBatches = batchesRef.current.filter(
-      (b) => b.tenantId === currentTenantRef.current.id && b.status !== 'DISPOSED'
+    const tenantId = currentTenantRef.current?.id;
+    const tenantBatches = (batchesRef.current || []).filter(
+      (b) => b && (!tenantId || b.tenantId === tenantId) && b.status !== 'DISPOSED'
     );
 
     // Match against active tenant batches (both exact and leading-zero normalized)
     const found = tenantBatches.find((b) => {
-      const bCode = b.barcode.trim();
-      const bSku = b.sku.trim();
-      const bNum = b.batchNumber.trim();
+      const bCode = (b.barcode || '').trim();
+      const bSku = (b.sku || '').trim();
+      const bNum = (b.batchNumber || '').trim();
       return (
         bCode === cleanCode ||
         bCode.replace(/^0+/, '') === cleanCode.replace(/^0+/, '') ||
@@ -298,6 +307,9 @@ export const CameraBarcodeScannerModal: React.FC<CameraBarcodeScannerModalProps>
 
     if (onBarcodeDetectedRef.current) {
       onBarcodeDetectedRef.current(cleanCode);
+    }
+    if (onScanSuccessRef.current) {
+      onScanSuccessRef.current(cleanCode);
     }
 
     setAuditScans((prev) => [
@@ -1103,7 +1115,7 @@ export const CameraBarcodeScannerModal: React.FC<CameraBarcodeScannerModalProps>
                         Scanned Code: <span className="font-mono text-emerald-800 font-extrabold">{scannedCode}</span>
                       </h4>
                       <p className="text-xs text-gray-600 mt-0.5">
-                        This barcode is not yet registered in {currentTenant.name}'s active batch inventory.
+                        This barcode is not yet registered in {currentTenant?.name || 'this store'}'s active batch inventory.
                       </p>
                     </div>
                   </div>

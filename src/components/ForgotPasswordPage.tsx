@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { ExpiryGuardLogo } from './ExpiryGuardLogo.tsx';
 import {
-  ShieldCheckIcon,
   EnvelopeIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -42,8 +42,8 @@ export const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
       <div className="w-full max-w-md">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-700 text-white shadow-sm ring-4 ring-emerald-100 mb-3">
-            <ShieldCheckIcon className="w-7 h-7" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white p-2 shadow-md border border-emerald-100 ring-4 ring-emerald-50 mb-3">
+            <ExpiryGuardLogo className="w-full h-full" variant="original" />
           </div>
           <h1 className="text-2xl font-bold text-gray-950 tracking-tight">ExpiryGuard</h1>
           <p className="text-sm text-gray-500 mt-1">Supermarket & Mall Expiry System</p>

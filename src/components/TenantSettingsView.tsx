@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Tenant, UserRole, User } from '../types/index.ts';
 import {
   BuildingStorefrontIcon,
-  ShieldCheckIcon,
   BellAlertIcon,
   UserGroupIcon,
   CheckCircleIcon,
@@ -43,7 +42,7 @@ export const TenantSettingsView: React.FC<TenantSettingsViewProps> = ({
   const [defaultDiscount, setDefaultDiscount] = useState(currentTenant.defaultClearanceDiscount);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  const tenantUsers = users.filter((u) => u.tenantId === currentTenant.id);
+  const tenantUsers = (users || []).filter((u) => u && u.tenantId === currentTenant?.id);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

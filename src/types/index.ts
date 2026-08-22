@@ -112,6 +112,30 @@ export interface ExpiryAlert {
   createdAt: string;
 }
 
+export interface CartItem {
+  batch: Batch;
+  quantity: number;
+  unitPrice: number;
+  originalPrice: number;
+  discountPercent: number;
+  isClearance: boolean;
+}
+
+export interface SaleReceipt {
+  id: string;
+  receiptNumber: string;
+  barcodeValue?: string;
+  tenantId: string;
+  cashierName: string;
+  items: CartItem[];
+  subtotal: number;
+  savings: number;
+  tax: number;
+  total: number;
+  timestamp: string;
+  paymentMethod: 'CASH' | 'CARD' | 'MOBILE_PAY';
+}
+
 export type ActiveNavTab =
   | 'DASHBOARD'
   | 'INVENTORY'
@@ -121,3 +145,4 @@ export type ActiveNavTab =
   | 'DISPOSAL'
   | 'CATEGORIES'
   | 'SETTINGS';
+

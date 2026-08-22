@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { ActiveNavTab, UserRole, Tenant, User } from '../types/index.ts';
+import { ExpiryGuardLogo } from './ExpiryGuardLogo.tsx';
 import {
   Squares2X2Icon,
   ArchiveBoxIcon,
   BellAlertIcon,
   QrCodeIcon,
+  ShoppingCartIcon,
   TagIcon,
   TrashIcon,
   FolderIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   XMarkIcon,
-  ShieldCheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from '@heroicons/react/24/outline';
@@ -58,8 +59,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     },
     {
       id: 'CASHIER_SCAN' as ActiveNavTab,
-      label: 'POS Fast Scan',
-      icon: QrCodeIcon,
+      label: 'POS Checkout Register',
+      icon: ShoppingCartIcon,
       roles: ['CASHIER', 'STORE_MANAGER', 'TENANT_ADMIN'],
     },
     {
@@ -124,11 +125,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
             <div
-              className="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center shadow-xs ring-2 ring-emerald-600/30 shrink-0 cursor-pointer"
+              className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-xs ring-1 ring-emerald-500/30 shrink-0 cursor-pointer overflow-hidden"
               onClick={collapsed ? toggleCollapse : undefined}
               title={collapsed ? 'Click to expand sidebar' : undefined}
             >
-              <ShieldCheckIcon className="w-6 h-6" />
+              <ExpiryGuardLogo className="w-full h-full" />
             </div>
 
             {!collapsed && (

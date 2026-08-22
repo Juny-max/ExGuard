@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Tenant, UserRole, DisposalLog } from '../types/index.ts';
+import { formatCedi } from '../utils/currency.ts';
 import {
   TrashIcon,
   CurrencyDollarIcon,
@@ -21,7 +22,7 @@ export const DisposalView: React.FC<DisposalViewProps> = ({
 }) => {
   const [reasonFilter, setReasonFilter] = useState<string>('ALL');
 
-  const tenantLogs = disposalLogs.filter((log) => log.tenantId === currentTenant.id);
+  const tenantLogs = (disposalLogs || []).filter((log) => log && log.tenantId === currentTenant?.id);
 
   const filteredLogs = tenantLogs.filter((log) => {
     if (reasonFilter === 'ALL') return true;
@@ -46,7 +47,7 @@ export const DisposalView: React.FC<DisposalViewProps> = ({
 
         <div className="flex items-center gap-2">
           <div className="bg-red-50 text-red-950 px-3.5 py-1.5 rounded-lg border border-red-200 text-xs font-bold">
-            Total Period Write-Off: ${totalLossAmount.toFixed(2)}
+            Total Period Write-Off: {formatCedi(totalLossAmount)}
           </div>
         </div>
       </div>
@@ -70,7 +71,7 @@ export const DisposalView: React.FC<DisposalViewProps> = ({
             Total Financial Cost
           </span>
           <div className="mt-2 text-3xl font-extrabold text-red-700">
-            ${totalLossAmount.toFixed(2)}
+            {formatCedi(totalLossAmount)}
           </div>
           <span className="text-xs text-red-700 mt-1 block">
             Net inventory loss write-off
@@ -141,7 +142,7 @@ export const DisposalView: React.FC<DisposalViewProps> = ({
                   </div>
                   <div>
                     <span className="text-[10px] text-gray-500 block uppercase font-bold">Financial Loss</span>
-                    <span className="font-bold text-red-700">${log.totalLoss.toFixed(2)}</span>
+                    <span className="font-bold text-red-700">{formatCedi(log.totalLoss)}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-gray-500 block uppercase font-bold">Staff & Witness</span>
@@ -196,7 +197,7 @@ export const DisposalView: React.FC<DisposalViewProps> = ({
                       {log.quantityDisposed} {log.unit}
                     </td>
                     <td className="px-4 py-3 font-bold text-red-700">
-                      ${log.totalLoss.toFixed(2)}
+                      {formatCedi(log.totalLoss)}
                     </td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-900 border border-red-200">
